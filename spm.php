@@ -1,21 +1,22 @@
 <?php
 
 /**
- *  Плагін для націнки на товари
+ *  Simple Product Margin
  *
- * @link              #
+ * @link              https://board.te.ua
  * @since             1.0.0
- * @package           mark_up
+ * @package           simple_product_margin
  *
  * @wordpress-plugin
- * Plugin Name:       Плагін для націнки на товари
+ * Plugin Name:       Simple Product Margin
  * Plugin URI:        #
- * Description:       Простий плагін для додачі націнки у відстотках
+ * Description:       Helps to make product margin in percentage. Globally and per product
  * Version:           1.0.0
  * Author:            org100h
  * Author URI:        #
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Text Domain:       spm
  */
 if (!defined('WPINC')) {
     die;
@@ -54,7 +55,7 @@ class mark_up {
             'id' => 'cost_price',
             'type' => 'number',
             'class' => 'wc_input_price short',
-            'label' => 'Націнка (%)',
+            'label' => __('Margin (%)', 'spm'),
             'css' => 'width:50px;',
             'default' => '1',
             'custom_attributes' => array(
@@ -72,7 +73,7 @@ class mark_up {
             if (isset($section['id']) && 'general_options' == $section['id'] &&
                     isset($section['type']) && 'sectionend' == $section['type']) {
                 $updated_settings[] = [
-                    'name' => 'Глобальна націнка (%)',
+                    'name' => __('Global margin (%)', 'spm'),
                     'id' => 'global_cost_price',
                     'type' => 'number',
                     'css' => 'width:50px;',
@@ -97,7 +98,7 @@ class mark_up {
         // If this is a auto save do nothing, we only save when update button is clicked
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE)
             return;
-        
+
         if (isset($_POST['cost_price'])) {
             if (is_numeric($_POST['cost_price']))
                 update_post_meta($product_id, 'cost_price', $_POST['cost_price']);
