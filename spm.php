@@ -45,9 +45,6 @@ class mark_up {
         // Variable (price range)
         add_filter('woocommerce_variation_prices_price', [$this, 'up_custom_variable_price'], 99, 3);
         add_filter('woocommerce_variation_prices_regular_price', [$this, 'up_custom_variable_price'], 99, 3);
-
-        // Handling price caching
-        add_filter('woocommerce_get_variation_prices_hash', [$this, 'up_add_price_multiplier_to_variation_prices_hash'], 99, 1);
     }
 
     public function up_cost_product_field() {
@@ -58,10 +55,9 @@ class mark_up {
             'label' => __('Margin (%)', 'spm'),
             'css' => 'width:50px;',
             'default' => '1',
-            'custom_attributes' => array(
-                'min' => 1,
+            'custom_attributes' => [
                 'step' => 1,
-            ),
+            ],
         ]);
     }
 
@@ -90,9 +86,9 @@ class mark_up {
         return $updated_settings;
     }
 
-    public function up_save_product(int $product_id) {
+    public function up_save_product($product_id) {
         // stop the quick edit interferring as this will stop it saving properly, when a user uses quick edit feature
-        if (wp_verify_nonce($_POST['_inline_edit'], 'inlineeditnonce'))
+        if (isset($_POST['_inline_edit']) && wp_verify_nonce($_POST['_inline_edit'], 'inlineeditnonce'))
             return;
 
         // If this is a auto save do nothing, we only save when update button is clicked
@@ -114,18 +110,18 @@ class mark_up {
         return $this->up_percentage($price, $this->up_get_price_multiplier($product->get_id()));
     }
 
-    private function up_get_price_multiplier(int $product_id): int {
+    private function up_get_price_multiplier($product_id) {
         if (get_post_meta($product_id, 'cost_price')) {
             return get_post_meta($product_id, 'cost_price')[0];
         } elseif (get_option('global_cost_price')) {
             return get_option('global_cost_price');
         } else {
-            return 1;
+            return false;
         }
     }
 
-    private function up_percentage(int $num, int $per): float {
-        return $per > 0 ? $num + ($per / 100) * $num : 0;
+    private function up_percentage($num, $per) {
+        return $per ? $num + ($per / 100) * $num : 0;
     }
 
 }
